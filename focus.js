@@ -69,68 +69,73 @@
   const CARD_CSS = `
     :host { all: initial; }
     .wrap {
-      --paper: #f2efe8; --ink: #121211; --muted: #6d695f; --line: rgba(18,18,17,.14);
-      --signal: #ff4d00; --shadow: #121211;
-      position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+      --paper: #eeeeea; --ink: #0c0c0d; --muted: #62626a; --line: rgba(12,12,13,.14);
+      --signal: #1c3fff; --shadow: #0c0c0d;
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
       z-index: 2147483647;
       font: 500 12px/1.5 "FF Mono", ui-monospace, "SF Mono", Menlo, monospace;
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
     }
     @media (prefers-color-scheme: dark) {
-      .wrap { --paper: #121211; --ink: #f2efe8; --muted: #9c978b; --line: rgba(242,239,232,.16); --shadow: #ff4d00; }
+      .wrap { --paper: #0c0c0d; --ink: #eeeeea; --muted: #9a9aa3; --line: rgba(238,238,234,.16); --signal: #5b78ff; --shadow: #5b78ff; }
     }
     .card {
-      box-sizing: border-box; width: min(392px, calc(100vw - 32px));
-      padding: 18px 20px 20px; background: var(--paper);
+      box-sizing: border-box; width: min(680px, calc(100vw - 32px));
+      padding: 14px 18px 16px; background: var(--paper);
       border: 1.5px solid var(--ink); border-radius: 2px;
-      box-shadow: 7px 7px 0 var(--shadow);
+      box-shadow: 6px 6px 0 var(--shadow);
       animation: rise .32s cubic-bezier(.2,.8,.2,1) both;
     }
     @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
     .meta {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
-      font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+      font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
     }
     .meta .dim { color: var(--muted); font-weight: 500; }
     .meta .end { margin-left: auto; color: var(--muted); font-weight: 500; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); flex: none; }
+    .row { display: flex; align-items: center; gap: 20px; }
+    .text { flex: 1; min-width: 0; }
+    .text p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .num + .text p { white-space: normal; }
     h1 {
-      margin: 0 0 10px; font: 400 38px/1 "FF Serif", "Instrument Serif", Georgia, serif;
-      letter-spacing: -.02em;
+      margin: 0 0 4px; font: 400 30px/1 "FF Serif", "Instrument Serif", Georgia, serif;
+      letter-spacing: -.015em; white-space: nowrap;
     }
     h1 em { font-style: italic; color: var(--signal); }
-    p { margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.55; }
-    .stats {
-      display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 18px;
-      border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .stats { display: flex; flex: none; border-left: 1px solid var(--line); }
+    .stats > div { padding: 0 16px; border-right: 1px solid var(--line); }
+    .stats b {
+      display: block; font: italic 400 28px/1 "FF Serif", Georgia, serif;
+      letter-spacing: -.02em; font-variant-numeric: tabular-nums;
     }
-    .stats > div { padding: 10px 0; }
-    .stats > div + div { padding-left: 14px; border-left: 1px solid var(--line); }
-    .stats b { display: block; font: italic 400 32px/1 "FF Serif", Georgia, serif; letter-spacing: -.02em; }
-    .stats span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stats span {
+      display: block; margin-top: 4px; font-size: 9px; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted); white-space: nowrap;
+    }
+    .actions { display: flex; gap: 8px; flex: none; }
     button {
-      all: unset; box-sizing: border-box; cursor: pointer;
+      all: unset; box-sizing: border-box; cursor: pointer; white-space: nowrap;
       display: inline-flex; align-items: center; gap: 10px;
       padding: 11px 16px; border: 1.5px solid var(--ink); border-radius: 999px;
       font: 700 11px/1 "FF Mono", ui-monospace, Menlo, monospace;
       letter-spacing: .12em; text-transform: uppercase;
       background: var(--ink); color: var(--paper);
-      transition: transform .15s ease, background .15s ease, color .15s ease;
+      transition: transform .15s ease;
     }
     button:hover { transform: translate(-1px, -1px); }
     button:active { transform: translate(1px, 1px); }
     button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
     button .tag { color: var(--signal); }
+    @media (prefers-color-scheme: light) { button .tag { color: #8da0ff; } }
     button.ghost { background: transparent; color: var(--ink); }
-    .count { display: flex; align-items: baseline; gap: 10px; margin: -6px 0 6px; }
     .num {
-      font: italic 400 112px/.9 "FF Serif", Georgia, serif; letter-spacing: -.04em;
-      color: var(--ink); font-variant-numeric: tabular-nums;
+      flex: none; min-width: 64px; font: italic 400 72px/.8 "FF Serif", Georgia, serif;
+      letter-spacing: -.04em; font-variant-numeric: tabular-nums;
     }
-    .unit { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-    .bar { height: 3px; background: var(--line); margin: 0 0 18px; overflow: hidden; }
+    .bar { height: 3px; background: var(--line); margin-top: 10px; overflow: hidden; }
     .bar > i { display: block; height: 100%; width: 0; background: var(--signal); transition: width .25s linear; }
     .pill {
       padding: 12px 18px 12px 14px;
@@ -139,6 +144,13 @@
     }
     .pill .dot { animation: breathe 2.4s ease-in-out infinite; }
     @keyframes breathe { 50% { opacity: .35; transform: scale(.7); } }
+    @media (max-width: 640px) {
+      .row { flex-wrap: wrap; gap: 12px; }
+      .text { flex-basis: 100%; }
+      .stats { border-left: 0; }
+      .stats > div:first-child { padding-left: 0; }
+      h1 { white-space: normal; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .card, .pill, .pill .dot { animation: none; }
       button, .bar > i { transition: none; }
@@ -201,9 +213,10 @@
       key = "notifications";
       html = `<div class="card">
         ${meta("Notifications")}
-        <h1>Notifications are <em>off</em>.</h1>
-        <p>Messages still work.</p>
-        <div class="actions"><button type="button" data-action="messages">Open messages</button></div>
+        <div class="row">
+          <div class="text"><h1>Notifications are <em>off</em>.</h1><p>Messages still work.</p></div>
+          <div class="actions"><button type="button" data-action="messages">Open messages</button></div>
+        </div>
       </div>`;
     } else if (page !== "feed") {
       key = "none";
@@ -214,30 +227,39 @@
       key = "counting";
       html = `<div class="card">
         ${meta("Unlocking", SITE_NAME)}
-        <div class="count"><span class="num">${Math.ceil(remainingSeconds())}</span><span class="unit">seconds</span></div>
-        <p>Stay on this page. Switching tabs or apps resets the timer.</p>
-        <div class="bar"><i></i></div>
-        <div class="actions"><button type="button" class="ghost" data-action="cancel">Never mind</button></div>
+        <div class="row">
+          <span class="num">${Math.ceil(remainingSeconds())}</span>
+          <div class="text">
+            <h1>seconds to <em>go</em>.</h1>
+            <p>Stay on this page. Switching tabs or apps resets the timer.</p>
+            <div class="bar"><i></i></div>
+          </div>
+          <div class="actions"><button type="button" class="ghost" data-action="cancel">Never mind</button></div>
+        </div>
       </div>`;
     } else {
       key = `locked:${resetNotice}:${liFallback}:${today.blocked}:${today.minutes}`;
-      const sessions = today.blocked === 1 ? "session blocked" : "sessions blocked";
+      const sessions = "Blocked today";
       html = `<div class="card">
         ${meta(SITE_NAME, `Resets ${resetLabel()}`)}
-        <h1>The feed is <em>quiet</em>.</h1>
-        <p>${
-          resetNotice
-            ? "You left the page, so the timer reset."
-            : `Posting still works. Want the feed anyway? Stay here for ${FF.UNLOCK_SECONDS} seconds and it stays open until ${resetLabel()}.`
-        }</p>
-        <div class="stats">
-          <div><b>${today.blocked}</b><span>${sessions} today</span></div>
-          <div><b>${FF.formatMinutes(today.minutes)}</b><span>won back today</span></div>
-        </div>
-        <div class="actions">
-          <button type="button" data-action="start">Show feed <span class="tag">${FF.UNLOCK_SECONDS}s</span></button>${
-            liFallback ? '<button type="button" class="ghost" data-action="compose">Write a post</button>' : ""
-          }
+        <div class="row">
+          <div class="text">
+            <h1>The feed is <em>quiet</em>.</h1>
+            <p>${
+              resetNotice
+                ? "You left the page, so the timer reset."
+                : "Posting and messages still work."
+            }</p>
+          </div>
+          <div class="stats">
+            <div><b>${today.blocked}</b><span>${sessions}</span></div>
+            <div><b>${FF.formatMinutes(today.minutes)}</b><span>Won back</span></div>
+          </div>
+          <div class="actions">
+            <button type="button" data-action="start">Show feed <span class="tag">${FF.UNLOCK_SECONDS}s</span></button>${
+              liFallback ? '<button type="button" class="ghost" data-action="compose">Write a post</button>' : ""
+            }
+          </div>
         </div>
       </div>`;
     }

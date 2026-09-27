@@ -4,12 +4,12 @@
 @font-face { font-family: "FF Mono"; src: url("fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
 
 :root {
-  --paper: #f2efe8; --ink: #121211; --muted: #6d695f; --line: rgba(18,18,17,.14);
-  --bar: #121211; --signal: #ff4d00;
+  --paper: #eeeeea; --ink: #0c0c0d; --muted: #62626a; --line: rgba(12,12,13,.14);
+  --bar: #0c0c0d; --signal: #1c3fff;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --paper: #121211; --ink: #f2efe8; --muted: #9c978b; --line: rgba(242,239,232,.16); --bar: #d8d4ca; color-scheme: dark; }
+  :root { --paper: #0c0c0d; --ink: #eeeeea; --muted: #9a9aa3; --line: rgba(238,238,234,.16); --bar: #d4d4d8; --signal: #5b78ff; color-scheme: dark; }
 }
 
 * { box-sizing: border-box; }
@@ -82,7 +82,7 @@ button {
   background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink);
   letter-spacing: .13em; text-transform: uppercase;
 }
-button:hover { background: var(--signal); border-color: var(--signal); color: #121211; }
+button:hover { background: var(--signal); border-color: var(--signal); color: #fff; }
 button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
 
 .foot { padding-top: 12px; border-top: 1.5px solid var(--ink); font-size: 9px; color: var(--muted); line-height: 1.6; }
