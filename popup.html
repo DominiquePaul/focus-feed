@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Focus Feed</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="meta">
+    <span class="dot"></span>Focus Feed
+    <span class="end" id="version"></span>
+  </header>
+
+  <section class="hero">
+    <p class="label">Time won back</p>
+    <p class="big" id="total">0m</p>
+    <p class="note" id="since">Counting starts now.</p>
+  </section>
+
+  <section class="tiles">
+    <div><b id="today-blocked">0</b><span>Blocked today</span></div>
+    <div><b id="today-saved">0m</b><span>Saved today</span></div>
+    <div><b id="week-blocked">0</b><span>This week</span></div>
+  </section>
+
+  <section class="chart">
+    <p class="label">Sessions blocked <span class="dim">/ last 14 days</span></p>
+    <div class="plot" id="plot" role="img"></div>
+    <div class="axis"><span id="axis-start"></span><span>Today</span></div>
+    <div class="tip" id="tip" hidden></div>
+  </section>
+
+  <section class="sites" id="sites"></section>
+
+  <footer class="foot" id="foot"></footer>
+
+  <script src="shared.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

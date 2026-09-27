@@ -1,0 +1,88 @@
+@font-face { font-family: "FF Serif"; src: url("fonts/instrument-serif-latin-400-normal.woff2") format("woff2"); font-style: normal; }
+@font-face { font-family: "FF Serif"; src: url("fonts/instrument-serif-latin-400-italic.woff2") format("woff2"); font-style: italic; }
+@font-face { font-family: "FF Mono"; src: url("fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "FF Mono"; src: url("fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+
+:root {
+  --paper: #f2efe8; --ink: #121211; --muted: #6d695f; --line: rgba(18,18,17,.14);
+  --bar: #121211; --signal: #ff4d00;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #121211; --ink: #f2efe8; --muted: #9c978b; --line: rgba(242,239,232,.16); --bar: #d8d4ca; color-scheme: dark; }
+}
+
+* { box-sizing: border-box; }
+body {
+  width: 340px; margin: 0; padding: 18px 20px 16px;
+  background: var(--paper); color: var(--ink);
+  font: 500 12px/1.5 "FF Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+
+.meta, .label, .tiles span, .axis, .foot, .site .state, button {
+  letter-spacing: .13em; text-transform: uppercase;
+}
+.meta { display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; }
+.meta .end { margin-left: auto; color: var(--muted); font-weight: 500; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); flex: none; }
+.label { font-size: 10px; font-weight: 700; }
+.dim { color: var(--muted); font-weight: 500; }
+
+.hero { padding: 26px 0 18px; }
+.big {
+  font: italic 400 76px/.95 "FF Serif", Georgia, serif; letter-spacing: -.035em;
+  margin: 6px 0 8px;
+}
+.note { color: var(--muted); font-size: 11px; }
+
+.tiles {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--line);
+}
+.tiles > div { padding: 10px 0 10px 12px; }
+.tiles > div:first-child { padding-left: 0; }
+.tiles > div + div { border-left: 1px solid var(--line); }
+.tiles b { display: block; font: italic 400 32px/1.05 "FF Serif", Georgia, serif; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tiles span { font-size: 9px; color: var(--muted); }
+
+.chart { position: relative; padding: 18px 0 16px; border-bottom: 1px solid var(--line); }
+.plot {
+  display: grid; grid-template-columns: repeat(14, 1fr); gap: 2px;
+  align-items: end; height: 72px; margin-top: 12px;
+  border-bottom: 1px solid var(--ink);
+}
+.col { height: 100%; display: flex; align-items: flex-end; cursor: default; }
+.col i {
+  display: block; width: 100%; background: var(--bar);
+  border-radius: 4px 4px 0 0; min-height: 0;
+}
+.col.today i { background: var(--signal); }
+.col:hover i { opacity: .7; }
+.col.empty i { height: 1px !important; border-radius: 0; background: var(--line); }
+.axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: 9px; color: var(--muted); }
+.tip {
+  position: absolute; top: 8px; padding: 6px 8px; pointer-events: none;
+  background: var(--ink); color: var(--paper); font-size: 10.5px; white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.sites { padding: 6px 0; }
+.site { display: flex; align-items: center; gap: 10px; padding: 10px 0; }
+.site + .site { border-top: 1px solid var(--line); }
+.site .name { font: 400 22px/1 "FF Serif", Georgia, serif; min-width: 78px; }
+.site .state { white-space: nowrap; display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); }
+.site .state .dot { background: var(--ink); }
+.site.open .state { color: var(--ink); }
+.site.open .state .dot { background: var(--signal); }
+button {
+  all: unset; box-sizing: border-box; cursor: pointer; margin-left: auto; flex: none; white-space: nowrap;
+  padding: 7px 11px; border-radius: 999px; font-size: 10px; font-weight: 700;
+  background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink);
+  letter-spacing: .13em; text-transform: uppercase;
+}
+button:hover { background: var(--signal); border-color: var(--signal); color: #121211; }
+button:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+.foot { padding-top: 12px; border-top: 1.5px solid var(--ink); font-size: 9px; color: var(--muted); line-height: 1.6; }

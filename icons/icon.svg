@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Focus Feed: a sun rising over a flat horizon. The feed is flattened
+       to a single line, and every day starts fresh at 6 AM. -->
+  <defs><clipPath id="c"><rect width="128" height="128" rx="28"/></clipPath></defs>
+  <g clip-path="url(#c)">
+    <rect width="128" height="128" fill="#f2efe8"/>
+    <circle cx="82" cy="76" r="33" fill="#ff4d00"/>
+    <rect y="76" width="128" height="52" fill="#121211"/>
+  </g>
+</svg>
