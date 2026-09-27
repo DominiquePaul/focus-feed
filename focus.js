@@ -1,5 +1,5 @@
 // Focus Feed: hides the X and LinkedIn feeds + notifications while leaving
-// posting and messages alone. The feed is unlocked by keeping the page open
+// posting and messages alone. Unlocking a feed brings its notifications back. The feed is unlocked by keeping the page open
 // and focused for FF.UNLOCK_SECONDS. It then stays unlocked (across reloads
 // and tabs) until the floating "Hide feed" button is pressed or the next
 // FF.RESET_HOUR (6 AM) comes around. Shared helpers live in shared.js.
@@ -214,12 +214,12 @@
 
     if (!ready) {
       key = "none";
-    } else if (page === "notifications") {
+    } else if (page === "notifications" && state !== "unlocked") {
       key = "notifications";
       html = `<div class="card">
         ${meta("Notifications")}
         <div class="row">
-          <div class="text"><h1>Notifications are <em>off</em>.</h1><p>Messages still work.</p></div>
+          <div class="text"><h1>Notifications are <em>off</em>.</h1><p>They come back when you unlock the feed.</p></div>
           <div class="actions"><button type="button" data-action="messages">Open messages</button></div>
         </div>
       </div>`;
@@ -532,19 +532,23 @@
   }
 
   function hideLinkedInNotifications() {
-    hideNotificationsIn(document);
+    if (state !== "unlocked") hideNotificationsIn(document);
     if (Date.now() - lastShadowScan > 1000) {
       lastShadowScan = Date.now();
       shadowRoots = findShadowRoots();
     }
     for (const sr of shadowRoots) {
-      if (!sr.querySelector("style[data-ff]")) {
-        const style = document.createElement("style");
+      let style = sr.querySelector("style[data-ff]");
+      if (!style) {
+        style = document.createElement("style");
         style.setAttribute("data-ff", "");
         style.textContent = SHADOW_CSS;
         sr.append(style);
       }
-      hideNotificationsIn(sr);
+      // focus.css shows notifications again once the feed is unlocked;
+      // shadow roots follow along here.
+      style.disabled = state === "unlocked";
+      if (state !== "unlocked") hideNotificationsIn(sr);
     }
   }
 
@@ -573,9 +577,11 @@
     if (site === "li") hideLinkedInNotifications();
     if (site === "li" && onFeed && state !== "unlocked") hideLinkedInFeed();
 
-    const title = document.title;
-    const cleaned = title.replace(/^\(\d+\+?\)\s*/, "");
-    if (cleaned !== title) document.title = cleaned;
+    if (state !== "unlocked") {
+      const title = document.title;
+      const cleaned = title.replace(/^\(\d+\+?\)\s*/, "");
+      if (cleaned !== title) document.title = cleaned;
+    }
 
     render();
   }

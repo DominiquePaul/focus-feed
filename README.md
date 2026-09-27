@@ -5,7 +5,7 @@ A browser extension that turns the X and LinkedIn feeds off by default. Messagin
 ## How it works
 
 - **Feeds off.** The feed is hidden on X (Home and Explore) and LinkedIn (home feed and both sidebars). The post composer stays, so you can still post.
-- **Notifications off, messages on.** The bell, the red count badges and the `(3)` in the tab title are hidden. Messaging and its badge stay.
+- **Notifications off, messages on.** The bell, the red count badges and the `(3)` in the tab title are hidden. Messaging and its badge stay. Unlocking the feed brings the notifications back too, and **Hide feed** hides both again.
 - **15 seconds to unlock.** Click **Show feed** and stay on the page. Switching tabs or apps resets the timer.
 - **Stays unlocked until you stop it.** Once a feed is unlocked, it stays unlocked across reloads, tabs and restarts. Each site is unlocked separately.
 - **One click to hide it again.** A floating **Hide feed** button sits on the unlocked feed.

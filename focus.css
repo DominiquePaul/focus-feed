@@ -2,7 +2,8 @@
  * Focus Feed styles. focus.js sets these attributes on <html>:
  *   data-ff-site      "x" | "li"
  *   data-ff-page      "feed" | "notifications" | "other"
- *   data-ff-unlocked  present while the feed is unlocked (saved across reloads)
+ *   data-ff-unlocked  present while the feed is unlocked (saved across reloads);
+ *                     notifications show again too
  * The card and button live in a shadow root created by focus.js.
  * Everything is hidden with CSS (injected at document_start) so the feed
  * never flashes on screen before the script runs.
@@ -21,12 +22,12 @@ html[data-ff-site="x"]:not([data-ff-unlocked]) a[data-testid="AppTabBar_Explore_
   display: none !important;
 }
 
-/* ---------- X / Twitter: notifications (messages stay visible) ---------- */
+/* ---------- X / Twitter: notifications (back once the feed is unlocked) ---------- */
 
-html[data-ff-site="x"] a[data-testid="AppTabBar_Notifications_Link"] {
+html[data-ff-site="x"]:not([data-ff-unlocked]) a[data-testid="AppTabBar_Notifications_Link"] {
   display: none !important;
 }
-html[data-ff-site="x"][data-ff-page="notifications"] [data-testid="primaryColumn"] {
+html[data-ff-site="x"]:not([data-ff-unlocked])[data-ff-page="notifications"] [data-testid="primaryColumn"] {
   visibility: hidden !important;
 }
 
@@ -55,20 +56,20 @@ html[data-ff-site="li"][data-ff-page="feed"]:not([data-ff-unlocked]):not([data-f
   visibility: hidden !important;
 }
 
-/* ---------- LinkedIn: notifications (messages stay visible) ---------- */
+/* ---------- LinkedIn: notifications (back once the feed is unlocked) ---------- */
 
-html[data-ff-site="li"] nav li:has(a[href*="/notifications"]),
-html[data-ff-site="li"] header li:has(a[href*="/notifications"]),
-html[data-ff-site="li"] a[href*="/notifications"],
-html[data-ff-site="li"] a[data-test-global-nav-link="notifications"],
-html[data-ff-site="li"] .global-nav__primary-item:has(li-icon[type^="bell"], [data-test-icon^="bell"]),
-html[data-ff-site="li"] [data-ff-hide-notif],
+html[data-ff-site="li"]:not([data-ff-unlocked]) nav li:has(a[href*="/notifications"]),
+html[data-ff-site="li"]:not([data-ff-unlocked]) header li:has(a[href*="/notifications"]),
+html[data-ff-site="li"]:not([data-ff-unlocked]) a[href*="/notifications"],
+html[data-ff-site="li"]:not([data-ff-unlocked]) a[data-test-global-nav-link="notifications"],
+html[data-ff-site="li"]:not([data-ff-unlocked]) .global-nav__primary-item:has(li-icon[type^="bell"], [data-test-icon^="bell"]),
+html[data-ff-site="li"]:not([data-ff-unlocked]) [data-ff-hide-notif],
 /* Red badges on every nav item except Messaging (e.g. My Network, Jobs). */
-html[data-ff-site="li"] nav li:not(:has(a[href*="/messaging"])) .notification-badge,
-html[data-ff-site="li"] header li:not(:has(a[href*="/messaging"])) .notification-badge {
+html[data-ff-site="li"]:not([data-ff-unlocked]) nav li:not(:has(a[href*="/messaging"])) .notification-badge,
+html[data-ff-site="li"]:not([data-ff-unlocked]) header li:not(:has(a[href*="/messaging"])) .notification-badge {
   display: none !important;
 }
-html[data-ff-site="li"][data-ff-page="notifications"] main,
-html[data-ff-site="li"][data-ff-page="notifications"] .scaffold-layout__main {
+html[data-ff-site="li"]:not([data-ff-unlocked])[data-ff-page="notifications"] main,
+html[data-ff-site="li"]:not([data-ff-unlocked])[data-ff-page="notifications"] .scaffold-layout__main {
   visibility: hidden !important;
 }
