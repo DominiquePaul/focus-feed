@@ -2,6 +2,16 @@
 
 A browser extension that turns the X and LinkedIn feeds off by default. Messaging and posting keep working, and the notifications stay hidden. If you still want the feed, you have to wait for it.
 
+## Install in 1 minute (Chrome, Arc, Brave, Edge)
+
+1. **[Download Focus Feed](https://github.com/DominiquePaul/focus-feed/archive/refs/heads/main.zip)** and unzip it. Move the `focus-feed-main` folder somewhere you'll keep it, such as Documents, because the browser loads the extension from that folder.
+2. Paste `chrome://extensions` into the address bar and turn on **Developer mode** (top right).
+3. Drag the `focus-feed-main` folder onto that page. If dragging doesn't work, click **Load unpacked** and pick the folder instead.
+
+That's it. Open LinkedIn or X and the feed is gone. Pin the icon in the toolbar to see your stats.
+
+<sub>**Updating:** download again, replace the folder, then click the reload icon on the Focus Feed card in `chrome://extensions`. If you cloned with git, `git pull` and reload instead.</sub>
+
 ## How it works
 
 - **Feeds off.** The feed is hidden on X (Home and Explore) and LinkedIn (home feed and both sidebars). The post composer stays, so you can still post.
@@ -35,14 +45,6 @@ A browser extension that turns the X and LinkedIn feeds off by default. Messagin
 </table>
 
 <sub>The screenshots use a neutral mock page, not real feeds.</sub>
-
-## Install (Chrome or Arc)
-
-1. Clone this repository.
-2. Open `chrome://extensions` (or `arc://extensions`) and turn on **Developer mode**.
-3. Click **Load unpacked** and select the cloned folder.
-
-To update, run `git pull`, click the reload icon on the Focus Feed card in the extensions page, and refresh X or LinkedIn.
 
 ## How the numbers are counted
 
