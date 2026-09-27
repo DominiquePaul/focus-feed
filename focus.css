@@ -57,11 +57,15 @@ html[data-ff-site="li"][data-ff-page="feed"]:not([data-ff-unlocked]):not([data-f
 
 /* ---------- LinkedIn: notifications (messages stay visible) ---------- */
 
-html[data-ff-site="li"] nav li:has(a[href*="/notifications/"]),
+html[data-ff-site="li"] nav li:has(a[href*="/notifications"]),
+html[data-ff-site="li"] header li:has(a[href*="/notifications"]),
 html[data-ff-site="li"] a[href*="/notifications"],
+html[data-ff-site="li"] a[data-test-global-nav-link="notifications"],
+html[data-ff-site="li"] .global-nav__primary-item:has(li-icon[type^="bell"], [data-test-icon^="bell"]),
 html[data-ff-site="li"] [data-ff-hide-notif],
 /* Red badges on every nav item except Messaging (e.g. My Network, Jobs). */
-html[data-ff-site="li"] nav li:not(:has(a[href*="/messaging/"])) .notification-badge {
+html[data-ff-site="li"] nav li:not(:has(a[href*="/messaging"])) .notification-badge,
+html[data-ff-site="li"] header li:not(:has(a[href*="/messaging"])) .notification-badge {
   display: none !important;
 }
 html[data-ff-site="li"][data-ff-page="notifications"] main,

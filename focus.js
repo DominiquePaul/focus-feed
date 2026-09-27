@@ -13,9 +13,13 @@
   const site = /(^|\.)linkedin\.com$/.test(host) ? "li" : "x";
   const SITE_NAME = FF.SITES[site];
   const MESSAGES_URL = site === "x" ? "/messages" : "/messaging/";
+  // LinkedIn sometimes renders its top bar in a frame. Frames only get the
+  // notification hiding: no card, no feed, no stats.
+  const IS_FRAME = window !== window.top;
 
   function pageType() {
     const path = location.pathname;
+    if (IS_FRAME) return "frame";
     if (site === "x") {
       if (path === "/" || path === "/home" || path.startsWith("/explore")) return "feed";
       if (path.startsWith("/notifications")) return "notifications";
@@ -200,6 +204,7 @@
   }
 
   function render() {
+    if (IS_FRAME) return;
     const el = ensureCard();
     if (!el) return;
     const page = root.getAttribute("data-ff-page");
@@ -436,13 +441,22 @@
   }
 
   // The notifications bell and invitation/request entries, wherever
-  // LinkedIn's top bar puts them (the feed and messaging pages render
-  // different headers). Nav labels read like "Jobs, 0 new notifications",
-  // so only match labels that *start* with a notification word.
+  // LinkedIn's top bar puts them. The feed and messaging pages render
+  // different headers (the messaging one sometimes inside a shadow root or
+  // an iframe), so this works from links, icons, labels and badges rather
+  // than class names. Nav labels read like "Jobs, 0 new notifications", so
+  // only match labels that *start* with a notification word.
   const NOTIF_LABEL =
     /^\s*(notification|request|invitation|benachrichtigung|mitteilung|anfrage|einladung|notificaci|notifiche|notifica|demande)/i;
   const NOTIF_HREF = /\/notifications|\/invitation-manager|\/invitations?\b/;
+  const BELL = 'svg[id^="bell"], [data-test-icon^="bell"], li-icon[type^="bell"], [data-test-global-nav-link="notifications"]';
   const TOP_BAR_PX = 120;
+
+  // Injected into shadow roots, where focus.css can't reach.
+  const SHADOW_CSS = `
+    [data-ff-hide-notif], a[href*="/notifications"],
+    a[data-test-global-nav-link="notifications"],
+    li:has(> a[href*="/notifications"]) { display: none !important; }`;
 
   const inTopBar = (el) => {
     const r = el.getBoundingClientRect();
@@ -461,37 +475,76 @@
     const target = item && !item.querySelector('[href*="messaging"]') ? item : el;
     target.setAttribute("data-ff-hide-notif", "");
   };
+  // Text directly inside the element, ignoring children like a
+  // visually-hidden "1 new notification" span.
+  const ownText = (el) => {
+    let t = "";
+    for (const n of el.childNodes) if (n.nodeType === 3) t += n.data;
+    return t.trim();
+  };
 
-  function hideLinkedInNotifications() {
+  function hideNotificationsIn(scope) {
     // Links to the notifications or invitations pages, anywhere.
-    for (const el of document.querySelectorAll("a[href]")) {
+    for (const el of scope.querySelectorAll("a[href]")) {
       if (el.hasAttribute("data-ff-hide-notif")) continue;
       if (NOTIF_HREF.test(el.getAttribute("href")) && !isMessaging(el)) hideNotif(el);
     }
 
     // Top-bar entries labelled "Notifications" (or with a bell icon) that
     // aren't plain links, e.g. buttons or dropdowns.
-    const controls = document.querySelectorAll(
-      'header a, header button, nav a, nav button, [role="navigation"] a, [role="navigation"] button, svg[id^="bell"], [data-test-icon^="bell"]'
+    const controls = scope.querySelectorAll(
+      `header a, header button, nav a, nav button, [role="navigation"] a, [role="navigation"] button, ${BELL}`
     );
     for (let el of controls) {
-      if (el.matches("svg, [data-test-icon]")) el = el.closest("a, button") || el;
+      if (!el.matches("a, button")) el = el.closest("a, button") || el;
       if (el.hasAttribute("data-ff-hide-notif") || isMessaging(el) || !inTopBar(el)) continue;
       const label = el.getAttribute("aria-label") || el.textContent || "";
-      if (el.querySelector('svg[id^="bell"], [data-test-icon^="bell"]') || el.matches('svg[id^="bell"]') || NOTIF_LABEL.test(label)) {
-        hideNotif(el);
-      }
+      if (el.matches(BELL) || el.querySelector(BELL) || NOTIF_LABEL.test(label)) hideNotif(el);
     }
 
     // Unread-count badges ("11", "99+") on the remaining top-bar items,
     // except Messaging.
-    for (const bar of document.querySelectorAll('header, nav, [role="navigation"], #global-nav')) {
+    for (const bar of scope.querySelectorAll('header, nav, [role="navigation"], #global-nav')) {
       if (!inTopBar(bar)) continue;
-      for (const el of bar.querySelectorAll("span, div, sup, b")) {
-        if (el.childElementCount || el.hasAttribute("data-ff-hide-notif")) continue;
-        if (!/^\d+\+?$/.test(el.textContent.trim()) || isMessaging(el)) continue;
+      for (const el of bar.querySelectorAll("span, div, sup, b, .notification-badge")) {
+        if (el.hasAttribute("data-ff-hide-notif") || isMessaging(el)) continue;
+        if (!el.matches(".notification-badge") && !/^\d+\+?$/.test(ownText(el))) continue;
         el.setAttribute("data-ff-hide-notif", "");
       }
+    }
+  }
+
+  // Open shadow roots are found by a full scan, which is too slow for every
+  // tick, so it runs once a second.
+  let shadowRoots = [];
+  let lastShadowScan = 0;
+  function findShadowRoots() {
+    const found = [];
+    const walk = (scope) => {
+      for (const el of scope.querySelectorAll("*")) {
+        if (!el.shadowRoot || el === host_) continue;
+        found.push(el.shadowRoot);
+        walk(el.shadowRoot);
+      }
+    };
+    walk(document);
+    return found;
+  }
+
+  function hideLinkedInNotifications() {
+    hideNotificationsIn(document);
+    if (Date.now() - lastShadowScan > 1000) {
+      lastShadowScan = Date.now();
+      shadowRoots = findShadowRoots();
+    }
+    for (const sr of shadowRoots) {
+      if (!sr.querySelector("style[data-ff]")) {
+        const style = document.createElement("style");
+        style.setAttribute("data-ff", "");
+        style.textContent = SHADOW_CSS;
+        sr.append(style);
+      }
+      hideNotificationsIn(sr);
     }
   }
 
