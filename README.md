@@ -79,3 +79,7 @@ X and LinkedIn change their pages often.
 
 - **X:** the rules in `focus.css` use `data-testid` attributes, which rarely change.
 - **LinkedIn:** class names are randomized, so `focus.js` finds the "Start a post" box by its text and hides everything around it. If it can't find the box, the whole column stays hidden and a **Write a post** button appears instead. If LinkedIn is in a language the extension doesn't recognize, add its wording to `COMPOSER_TEXT` in `focus.js`.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The bundled fonts are under the SIL Open Font License (`fonts/OFL-*.txt`).
