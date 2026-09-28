@@ -552,6 +552,30 @@
     }
   }
 
+  // X's right sidebar: trends, "What's happening", "Live on X", who to
+  // follow. Its modules aren't consistently wrapped in <section>, so find
+  // each module by its heading and hide the largest block around it that
+  // doesn't also hold the search box. The search box and its dropdown stay.
+  const X_SIDE_TITLE =
+    /^\s*(what.s happening|live on x|who to follow|trends? for you|trending|today.s news|subscribe to premium|relevant people|you might like)/i;
+  const X_SEARCH = '[data-testid="SearchBox_Search_Input"], form[role="search"], input[type="search"]';
+  const X_POPUP = '[role="listbox"], [id^="typeaheadDropdown"], [data-testid*="typeahead"]';
+
+  function hideXSidebar() {
+    const side = document.querySelector('[data-testid="sidebarColumn"]');
+    if (!side) return;
+    const titles = side.querySelectorAll('h2, [role="heading"], span');
+    for (const title of titles) {
+      if (title.matches("span") && (title.childElementCount || !X_SIDE_TITLE.test(title.textContent))) continue;
+      if (title.closest("[data-ff-hide-side]") || title.closest(X_POPUP)) continue;
+      let block = title;
+      while (block.parentElement && block.parentElement !== side && !block.parentElement.querySelector(X_SEARCH)) {
+        block = block.parentElement;
+      }
+      if (!block.querySelector(X_SEARCH)) block.setAttribute("data-ff-hide-side", "");
+    }
+  }
+
   // ---------- main loop ----------
   // Both sites are single-page apps, so poll for URL changes rather than
   // relying on page loads. This also strips the "(3) " unread count that
@@ -576,6 +600,7 @@
 
     if (site === "li") hideLinkedInNotifications();
     if (site === "li" && onFeed && state !== "unlocked") hideLinkedInFeed();
+    if (site === "x" && state !== "unlocked") hideXSidebar();
 
     if (state !== "unlocked") {
       const title = document.title;

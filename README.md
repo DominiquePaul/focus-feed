@@ -14,7 +14,7 @@ That's it. Open LinkedIn or X and the feed is gone. Pin the icon in the toolbar 
 
 ## How it works
 
-- **Feeds off.** The feed is hidden on X (Home and Explore) and LinkedIn (home feed and both sidebars). The post composer stays, so you can still post.
+- **Feeds off.** The feed is hidden on X (Home and Explore, plus the sidebar's trends, "What's happening" and "Live on X") and LinkedIn (home feed and both sidebars). The post composer stays, so you can still post.
 - **Notifications off, messages on.** The bell, the red count badges and the `(3)` in the tab title are hidden. Messaging and its badge stay. Unlocking the feed brings the notifications back too, and **Hide feed** hides both again.
 - **15 seconds to unlock.** Click **Show feed** and stay on the page. Switching tabs or apps resets the timer.
 - **Stays unlocked until you stop it.** Once a feed is unlocked, it stays unlocked across reloads, tabs and restarts. Each site is unlocked separately.
