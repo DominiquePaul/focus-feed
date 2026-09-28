@@ -581,6 +581,35 @@
   // relying on page loads. This also strips the "(3) " unread count that
   // both sites prepend to the tab title.
 
+  // Everything that hides page content. Runs on every tick and also straight
+  // from a MutationObserver, which fires before the browser paints, so new
+  // content is hidden before it's ever on screen.
+  function hideNow() {
+    const page = pageType();
+    if (root.getAttribute("data-ff-page") !== page) root.setAttribute("data-ff-page", page);
+    if (site === "li") hideLinkedInNotifications();
+    if (site === "li" && page === "feed" && state !== "unlocked") hideLinkedInFeed();
+    if (site === "x" && state !== "unlocked") hideXSidebar();
+  }
+
+  // Busy pages mutate constantly, so run at most every 50 ms and catch the
+  // rest in the next animation frame, which is still before paint.
+  let lastHide = 0;
+  let hideQueued = false;
+  new MutationObserver(() => {
+    if (Date.now() - lastHide > 50) {
+      lastHide = Date.now();
+      hideNow();
+    } else if (!hideQueued) {
+      hideQueued = true;
+      requestAnimationFrame(() => {
+        hideQueued = false;
+        lastHide = Date.now();
+        hideNow();
+      });
+    }
+  }).observe(root, { childList: true, subtree: true });
+
   function tick() {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
@@ -598,9 +627,7 @@
 
     if (ready && onFeed && state === "locked" && !countedVisit) countBlockedVisit();
 
-    if (site === "li") hideLinkedInNotifications();
-    if (site === "li" && onFeed && state !== "unlocked") hideLinkedInFeed();
-    if (site === "x" && state !== "unlocked") hideXSidebar();
+    hideNow();
 
     if (state !== "unlocked") {
       const title = document.title;
