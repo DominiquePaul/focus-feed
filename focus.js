@@ -23,6 +23,13 @@
     if (site === "x") {
       if (path === "/" || path === "/home" || path.startsWith("/explore")) return "feed";
       if (path.startsWith("/notifications")) return "notifications";
+      // X opens the composer (N) and the photo viewer as modals over the
+      // page you were on, so the timeline behind them stays hidden.
+      if (path.startsWith("/compose/") || /\/status\/\d+\/(photo|video)\//.test(path)) return "compose";
+      const current = root.getAttribute("data-ff-page");
+      if ((current === "feed" || current === "compose") && document.querySelector('[aria-modal="true"]')) {
+        return "compose";
+      }
     } else {
       if (path === "/" || path === "/feed" || path === "/feed/") return "feed";
       if (path.startsWith("/notifications")) return "notifications";

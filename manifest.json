@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Focus Feed",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Hides the X and LinkedIn feeds and notifications. Posting and messages still work. Unlocking takes 15 seconds.",
   "icons": {
     "16": "icons/icon16.png",
