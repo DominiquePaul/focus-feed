@@ -1,6 +1,6 @@
 <img src="docs/banner.png" alt="Focus Feed" width="100%">
 
-A browser extension that turns the X and LinkedIn feeds off by default. Messaging and posting keep working, and the notifications stay hidden. If you still want the feed, you have to wait for it.
+A browser extension that hides feeds on X, LinkedIn and Instagram. Messaging and profile browsing keep working. X and LinkedIn have a timed unlock. Instagram feeds stay off.
 
 ## Install in 1 minute (Chrome, Arc, Brave, Edge)
 
@@ -8,11 +8,19 @@ A browser extension that turns the X and LinkedIn feeds off by default. Messagin
 2. Paste `chrome://extensions` into the address bar and turn on **Developer mode** (top right).
 3. Drag the `focus-feed-main` folder onto that page. If dragging doesn't work, click **Load unpacked** and pick the folder instead.
 
-That's it. Open LinkedIn or X and the feed is gone. Pin the icon in the toolbar to see your stats.
+That's it. Open LinkedIn, X or Instagram and the feed is gone. Pin the icon in the toolbar to see your stats.
 
 <sub>**Updating:** download again, replace the folder, then click the reload icon on the Focus Feed card in `chrome://extensions`. If you cloned with git, `git pull` and reload instead.</sub>
 
-## How it works
+## Instagram
+
+Instagram has no feed unlock. Home, Explore recommendations, the Reels viewer, Stories and notifications stay hidden. Search still shows accounts, and the inbox, message requests and conversations remain available. Shared media inside conversations stays available too.
+
+Profiles keep their posts, Reels grid and tagged grid. Photo posts opened from the current profile can open in Instagram's post dialog. Direct post links, reloaded post dialogs and the scrolling Reel viewer stay blocked. A blocked page offers shortcuts to messages, account search and the last profile you visited.
+
+Login, two-factor authentication and account settings keep working. The popup lists Instagram as "Always hidden". Visits to blocked content count toward statistics, but account searches do not.
+
+## How it works on X and LinkedIn
 
 - **Feeds off.** The feed is hidden on X (Home and Explore, plus the sidebar's trends, "What's happening" and "Live on X") and LinkedIn (home feed and both sidebars). The post composer stays, so you can still post.
 - **Notifications off, messages on.** The bell, the red count badges and the `(3)` in the tab title are hidden. Messaging and its badge stay. Unlocking the feed brings the notifications back too, and **Hide feed** hides both again.
@@ -72,15 +80,33 @@ These values are at the top of `shared.js`:
 | `shared.js` | Settings, storage helpers and the statistics maths |
 | `focus.js` | Page detection, the unlock flow and the on-page card (in a shadow DOM) |
 | `focus.css` | Hiding rules, injected at `document_start` so nothing flashes |
+| `instagram.js`, `instagram.css` | Instagram route checks, search and profile exceptions, and feed hiding |
+| `tests/` | Browser checks using local fixtures and mocked extension storage |
 | `popup.*` | The toolbar popup with statistics and per-site controls |
 | `fonts/` | Instrument Serif and JetBrains Mono (SIL Open Font License) |
 
 ## When a site changes its markup
 
-X and LinkedIn change their pages often.
+X, LinkedIn and Instagram change their pages often.
 
 - **X:** the rules in `focus.css` use `data-testid` attributes, which rarely change.
 - **LinkedIn:** class names are randomized, so `focus.js` finds the "Start a post" box by its text and hides everything around it. If it can't find the box, the whole column stays hidden and a **Write a post** button appears instead. If LinkedIn is in a language the extension doesn't recognize, add its wording to `COMPOSER_TEXT` in `focus.js`.
+
+Instagram uses URL paths, semantic navigation elements and search controls instead of generated class names. Unknown routes stay hidden. If Instagram changes its search markup, update `SEARCH` and `markSearchAndNavigation` in `instagram.js` and add a fixture in `tests/browser.js`.
+
+## Development and testing
+
+There is no build step or dependency install. Load this folder as an unpacked extension using the installation steps above. After editing, reload the extension and the affected site tabs.
+
+Run the local browser checks from the repository root:
+
+```sh
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8765/tests/browser.html`. The page runs the real content scripts and CSS against synthetic page layouts in an iframe. It checks visibility, dynamic content, navigation, profile post dialogs, messaging controls, video pausing, storage and the popup. It also checks X and LinkedIn hiding rules. Run `http://127.0.0.1:8765/tests/x.html` for X's unlock and relock flow in a top-level page. The test page uses mocked `chrome.storage` and makes no requests to Instagram.
+
+Before releasing, also load the unpacked extension in a signed-in browser and check Home, account search, a public profile, a profile post dialog, the inbox, a conversation, Reels and browser back/forward. Check narrow and wide windows. Fixture tests cannot verify extension injection, Instagram's event handlers or every live layout. Sending a message is not needed for these checks.
 
 ## License
 

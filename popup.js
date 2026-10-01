@@ -62,12 +62,12 @@
     const box = $("sites");
     box.replaceChildren();
     for (const [site, name] of Object.entries(FF.SITES)) {
-      const open = FF.isUnlockValid(items[`unlocked-${site}`]);
+      const open = site !== "ig" && FF.isUnlockValid(items[`unlocked-${site}`]);
       const row = document.createElement("div");
       row.className = "site" + (open ? " open" : "");
       row.innerHTML = `<span class="name"></span><span class="state"><span class="dot"></span><span></span></span>`;
       row.querySelector(".name").textContent = name;
-      row.querySelector(".state span:last-child").textContent = open ? `Open → ${resetLabel}` : "Hidden";
+      row.querySelector(".state span:last-child").textContent = site === "ig" ? "Always hidden" : open ? `Open → ${resetLabel}` : "Hidden";
       if (open) {
         const btn = document.createElement("button");
         btn.type = "button";

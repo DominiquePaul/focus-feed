@@ -1,8 +1,8 @@
 // Shared by the content script (focus.js) and the popup (popup.js).
 // Everything lives in chrome.storage.local:
 //   unlocked-li / unlocked-x   timestamp the feed was unlocked, or false
-//   lastBlock-li / lastBlock-x timestamp of the last blocked session
-//   stats                      { "YYYY-MM-DD": { li: {b, u}, x: {b, u} } }
+//   lastBlock-li / lastBlock-x / lastBlock-ig  last blocked session timestamp
+//   stats                      { "YYYY-MM-DD": { li: {b, u}, x: {b, u}, ig: {b, u} } }
 //                              b = sessions blocked, u = feed unlocked
 (() => {
   "use strict";
@@ -16,7 +16,7 @@
     SESSION_GAP_MS: 10 * 60 * 1000,
     // Estimated scrolling time avoided per blocked session.
     MINUTES_PER_SESSION: 7,
-    SITES: { li: "LinkedIn", x: "X" },
+    SITES: { li: "LinkedIn", x: "X", ig: "Instagram" },
   };
 
   FF.store = globalThis.chrome?.storage?.local;
