@@ -30,21 +30,21 @@
         "*://*.linkedin.com/*"
       ],
       "css": ["focus.css"],
-      "js": ["shared.js", "focus.js"],
+      "js": ["shared.js", "ui.js", "focus.js"],
       "run_at": "document_start",
       "all_frames": true
     },
     {
       "matches": ["*://instagram.com/*", "*://*.instagram.com/*"],
       "css": ["instagram.css"],
-      "js": ["shared.js", "instagram.js"],
+      "js": ["shared.js", "ui.js", "instagram.js"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
       "resources": ["fonts/*.woff2"],
-      "matches": ["*://x.com/*", "*://*.x.com/*", "*://twitter.com/*", "*://*.twitter.com/*", "*://*.linkedin.com/*"]
+      "matches": ["*://x.com/*", "*://*.x.com/*", "*://twitter.com/*", "*://*.twitter.com/*", "*://*.linkedin.com/*", "*://instagram.com/*", "*://*.instagram.com/*"]
     }
   ]
 }

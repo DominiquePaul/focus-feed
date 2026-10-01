@@ -10,8 +10,8 @@
   let passed = 0;
   let failed = 0;
   const source = async (file) => (await fetch(`../${file}`)).text();
-  const [css, shared, instagram, focusCSS, popup, popupHTML] = await Promise.all(
-    ["instagram.css", "shared.js", "instagram.js", "focus.css", "popup.js", "popup.html"].map(source)
+  const [css, shared, ui, instagram, focusCSS, popup, popupHTML] = await Promise.all(
+    ["instagram.css", "shared.js", "ui.js", "instagram.js", "focus.css", "popup.js", "popup.html"].map(source)
   );
   const delay = (ms = 30) => new Promise((resolve) => setTimeout(resolve, ms));
   const assert = (condition, message) => { if (!condition) throw new Error(message); };
@@ -24,9 +24,15 @@
   const mode = () => frame.contentDocument.documentElement.getAttribute("data-ff-ig-mode");
   const storageMock = `
     window.testData = {};
+    window.storageListeners = [];
     window.chrome = { runtime: {getManifest: () => ({version: 'test'}), getURL: p => '/' + p},
-      storage: {local: {get: (keys, cb) => cb(window.testData),
-        set: items => Object.assign(window.testData, items)}, onChanged: {addListener() {}}} };
+      storage: {local: {get: (keys, cb) => cb(structuredClone(window.testData)),
+        set: items => {
+          const changes = Object.fromEntries(Object.entries(items).map(([key, value]) =>
+            [key, {oldValue: window.testData[key], newValue: structuredClone(value)}]));
+          Object.assign(window.testData, structuredClone(items));
+          window.storageListeners.forEach(listener => listener(changes, 'local'));
+        }}, onChanged: {addListener(listener) { window.storageListeners.push(listener); }} } };
   `;
   const shell = `
     <aside><a href="/">Home</a> <a href="/explore/" id="search-link">Search</a>
@@ -44,7 +50,7 @@
     <a href="/stories/nasa/123/" id="story">Story</a>
     <a href="/nasa/p/PHOTO1/" id="photo">Profile photo</a>
     <a href="/nasa/p/PHOTO2/">Another profile photo</a></main>`;
-  const write = async (path, content, scripts = [shared, instagram], styles = css, before = "") => {
+  const write = async (path, content, scripts = [shared, ui, instagram], styles = css, before = "") => {
     const loaded = new Promise((resolve) => frame.onload = resolve);
     frame.src = "/tests/frame.html";
     await loaded;
@@ -206,7 +212,7 @@
     assert(pauses === 1, "message video was paused");
   });
   await test("Instagram ignores saved unlocks and search does not count as a blocked visit", async () => {
-    await write("/explore/", shell + feed, [shared, instagram], css,
+    await write("/explore/", shell + feed, [shared, ui, instagram], css,
       'window.testData["unlocked-ig"] = Date.now();');
     assert(mode() === "blocked" && !visible($("#feed")), "saved unlock exposed feed");
     assert(!frame.contentWindow.testData.stats, "search inflated blocked count");
@@ -219,6 +225,38 @@
     const ig = rows.find(r => r.textContent.includes("Instagram"));
     assert(ig.textContent.includes("Always hidden") && !ig.querySelector("button"), "Instagram can unlock");
     assert(rows.find(r => r.textContent.startsWith("X")).querySelector("button"), "X relock control missing");
+  });
+  await test("Instagram card reuses the shared daily statistics and updates when storage changes", async () => {
+    await write("/", shell + feed);
+    const stats = () => $("focus-feed-instagram").shadowRoot.querySelector("#stats").textContent;
+    assert(stats().includes("1") && stats().includes("7m"), "first block missing from card");
+    const win = frame.contentWindow;
+    const day = win.FF.dayKey();
+    win.FF.set({stats: {[day]: {li: {b: 2, u: 1}, x: {b: 1, u: 0}, ig: {b: 3, u: 0}}}});
+    assert(stats().includes("6") && stats().includes("35m"), "shared storage update missing from card");
+    await navigate("/direct/inbox/", '<main>Messages</main>');
+    await navigate("/", feed);
+    assert(win.testData.stats[day].ig.b === 3, "repeat visit inflated count");
+  });
+  await test("Popup totals, daily tiles and 14-day chart include Instagram and refresh live", async () => {
+    const content = popupHTML.match(/<body>([\s\S]*?)<script/)[1];
+    await write("/popup.html", content, [shared, popup], "");
+    const win = frame.contentWindow;
+    const today = win.FF.dayKey();
+    const yesterday = win.FF.lastDays(2)[0];
+    win.FF.set({stats: {
+      [yesterday]: {li: {b: 2, u: 1}, x: {b: 1, u: 0}, ig: {b: 3, u: 0}},
+      [today]: {li: {b: 1, u: 0}, x: {b: 2, u: 1}, ig: {b: 4, u: 0}},
+    }});
+    await delay();
+    assert($("#total").textContent === "1h 17m", "all-time minutes omit a site");
+    assert($("#today-blocked").textContent === "7", "daily blocked total wrong");
+    assert($("#today-saved").textContent === "42m", "daily time saved wrong");
+    assert($("#week-blocked").textContent === "13", "weekly total wrong");
+    assert($("#plot").children.length === 14, "chart day count changed");
+    assert($("#plot").lastElementChild.querySelector("i").style.height === "100%", "today chart bar wrong");
+    assert($("#plot").getAttribute("aria-label").endsWith(" 7"), "chart accessible summary omits Instagram");
+    assert($("#foot").textContent.includes("Instagram stays hidden"), "footer implies Instagram unlocks");
   });
   await test("Existing X feed CSS and messaging remain unchanged", async () => {
     await write("/home", '<main data-testid="primaryColumn"><section role="region" id="x-feed">Timeline</section><textarea id="x-compose"></textarea></main>',

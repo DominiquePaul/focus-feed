@@ -16,6 +16,8 @@
   let profilePath = "";
   let counted = false;
   let card;
+  let today = { blocked: 0, minutes: 0 };
+  let statsKey = "";
 
   function parts(path) {
     return path.split("/").filter(Boolean);
@@ -65,35 +67,32 @@
   function showCard(show) {
     if (!document.body) return;
     if (!card) {
-      card = document.createElement("focus-feed-instagram");
-      const shadow = card.attachShadow({ mode: "open" });
-      shadow.innerHTML = `
-        <style>
-          :host { all: initial; }
-          section { box-sizing: border-box; position: fixed; bottom: 24px; left: 50%;
-            transform: translateX(-50%); z-index: 2147483647; width: min(520px, calc(100vw - 32px));
-            padding: 20px; background: #eeeeea; color: #0c0c0d; border: 1.5px solid;
-            box-shadow: 5px 5px 0; font: 14px/1.5 system-ui, sans-serif; }
-          h1 { font: 30px/1.1 Georgia, serif; margin: 6px 0 10px; }
-          p { margin: 0 0 16px; } small { font-size: 11px; letter-spacing: .1em; }
-          nav { display: flex; flex-wrap: wrap; gap: 12px; }
-          a { color: inherit; border: 1px solid; border-radius: 24px; padding: 8px 14px; text-decoration: none; }
-          a:focus-visible { outline: 3px solid #1c3fff; outline-offset: 3px; }
-          [hidden] { display: none; }
-          @media (prefers-color-scheme: dark) { section { background: #0c0c0d; color: #eeeeea; } }
-        </style>
-        <section aria-label="Focus Feed">
-          <small>FOCUS FEED / INSTAGRAM</small>
-          <h1>The feed is off.</h1>
-          <p>Messages and account search stay available. View posts on a profile.</p>
-          <nav aria-label="Instagram shortcuts">
-            <a href="/direct/inbox/">Open messages</a>
-            <a href="/explore/">Search accounts</a>
-            <a id="profile" hidden>Back to profile</a>
+      const ui = FF.createCard("focus-feed-instagram");
+      card = ui.host;
+      ui.wrap.hidden = false;
+      ui.wrap.innerHTML = `
+        <section class="card" aria-label="Focus Feed">
+          ${FF.cardMeta(FF.SITES.ig.name)}
+          <div class="row">
+            <div class="text">
+              <h1>The feed is <em>off</em>.</h1>
+              <p class="multiline">Messages and account search stay available. View posts on a profile.</p>
+            </div>
+            <div id="stats"></div>
+          </div>
+          <nav class="actions" aria-label="Instagram shortcuts">
+            <a class="action" href="${FF.SITES.ig.messagesURL}">Open messages</a>
+            <a class="action ghost" href="/explore/">Search accounts</a>
+            <a class="action ghost" id="profile" hidden>Back to profile</a>
           </nav>
         </section>`;
     }
     card.hidden = !show;
+    const key = `${today.blocked}:${today.minutes}`;
+    if (key !== statsKey) {
+      card.shadowRoot.getElementById("stats").innerHTML = FF.cardStats(today);
+      statsKey = key;
+    }
     const back = card.shadowRoot.getElementById("profile");
     back.hidden = !profilePath;
     if (profilePath) back.setAttribute("href", profilePath);
@@ -131,11 +130,17 @@
     }
   }
 
-  async function countBlockedVisit() {
-    const now = Date.now();
-    const { "lastBlock-ig": last = 0 } = await FF.get("lastBlock-ig");
-    FF.set({ "lastBlock-ig": now });
-    if (now - last > FF.SESSION_GAP_MS) await FF.bump("ig", "b");
+  function applyStats(stats) {
+    today = FF.summarize(stats, 1);
+    update();
+  }
+  FF.get("stats").then(({ stats }) => applyStats(stats));
+  try {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "local" && "stats" in changes) applyStats(changes.stats.newValue);
+    });
+  } catch {
+    // Extension context gone; nothing to sync.
   }
 
   function silenceHiddenVideo(video) {
@@ -169,7 +174,7 @@
     showCard(blocked && !searching);
     if (blocked && !search && !isProfile(location.pathname) && !counted) {
       counted = true;
-      void countBlockedVisit();
+      void FF.countBlockedVisit("ig");
     } else if (!blocked || search) {
       counted = false;
     }

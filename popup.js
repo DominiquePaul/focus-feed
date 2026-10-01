@@ -10,7 +10,7 @@
 
   $("version").textContent = `v${chrome.runtime.getManifest().version}`;
   $("foot").textContent =
-    `Estimate: ${FF.MINUTES_PER_SESSION} min per blocked session, minus sessions you unlocked. Feeds hide again at ${resetLabel} daily.`;
+    `Estimate: ${FF.MINUTES_PER_SESSION} min per blocked session, minus sessions you unlocked. X and LinkedIn hide again at ${resetLabel} daily. Instagram stays hidden.`;
 
   function renderStats(stats = {}) {
     const all = FF.summarize(stats);
@@ -61,13 +61,13 @@
   function renderSites(items) {
     const box = $("sites");
     box.replaceChildren();
-    for (const [site, name] of Object.entries(FF.SITES)) {
-      const open = site !== "ig" && FF.isUnlockValid(items[`unlocked-${site}`]);
+    for (const [site, { name, canUnlock }] of Object.entries(FF.SITES)) {
+      const open = canUnlock && FF.isUnlockValid(items[`unlocked-${site}`]);
       const row = document.createElement("div");
       row.className = "site" + (open ? " open" : "");
       row.innerHTML = `<span class="name"></span><span class="state"><span class="dot"></span><span></span></span>`;
       row.querySelector(".name").textContent = name;
-      row.querySelector(".state span:last-child").textContent = site === "ig" ? "Always hidden" : open ? `Open → ${resetLabel}` : "Hidden";
+      row.querySelector(".state span:last-child").textContent = !canUnlock ? "Always hidden" : open ? `Open → ${resetLabel}` : "Hidden";
       if (open) {
         const btn = document.createElement("button");
         btn.type = "button";
