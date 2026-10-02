@@ -1,8 +1,8 @@
-// Shared by the content script (focus.js) and the popup (popup.js).
+// Shared settings and statistics for the content scripts and popup.
 // Everything lives in chrome.storage.local:
 //   unlocked-li / unlocked-x   timestamp the feed was unlocked, or false
-//   lastBlock-li / lastBlock-x timestamp of the last blocked session
-//   stats                      { "YYYY-MM-DD": { li: {b, u}, x: {b, u} } }
+//   lastBlock-li / lastBlock-x / lastBlock-ig  last blocked session timestamp
+//   stats                      { "YYYY-MM-DD": { li: {b, u}, x: {b, u}, ig: {b, u} } }
 //                              b = sessions blocked, u = feed unlocked
 (() => {
   "use strict";
@@ -16,7 +16,11 @@
     SESSION_GAP_MS: 10 * 60 * 1000,
     // Estimated scrolling time avoided per blocked session.
     MINUTES_PER_SESSION: 7,
-    SITES: { li: "LinkedIn", x: "X" },
+    SITES: {
+      li: { name: "LinkedIn", messagesURL: "/messaging/", canUnlock: true },
+      x: { name: "X", messagesURL: "/messages", canUnlock: true },
+      ig: { name: "Instagram", messagesURL: "/direct/inbox/", canUnlock: false },
+    },
   };
 
   FF.store = globalThis.chrome?.storage?.local;
@@ -63,6 +67,16 @@
     const entry = (day[site] ||= { b: 0, u: 0 });
     entry[field] = (entry[field] || 0) + 1;
     FF.set({ stats });
+  };
+
+  // All sites use the same quiet-time rule and existing storage keys.
+  FF.countBlockedVisit = async (site, now = Date.now()) => {
+    const key = `lastBlock-${site}`;
+    const { [key]: last = 0 } = await FF.get(key);
+    FF.set({ [key]: now });
+    if (now - last <= FF.SESSION_GAP_MS) return false;
+    await FF.bump(site, "b");
+    return true;
   };
 
   // The last `days` calendar days, oldest first.

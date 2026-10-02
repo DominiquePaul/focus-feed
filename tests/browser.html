@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Focus Feed browser tests</title>
+<style>
+  body { font: 16px/1.5 system-ui; max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+  iframe { width: 100%; height: 540px; border: 1px solid #bbb; }
+  .pass { color: #17622f; } .fail { color: #b00020; }
+</style>
+<h1>Focus Feed browser tests</h1>
+<p id="status">Running…</p>
+<ol id="results"></ol>
+<p>Also run the <a href="/tests/x.html">top-level X unlock test</a>.</p>
+<p><label><input id="narrow" type="checkbox"> Narrow preview</label></p>
+<iframe title="Extension test page"></iframe>
+<script src="browser.js"></script>
+</html>

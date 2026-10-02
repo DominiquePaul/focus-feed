@@ -7,16 +7,17 @@ Copy these into the developer dashboard (https://chrome.google.com/webstore/devc
 **Name:** Focus Feed
 
 **Summary** (max 132 characters):
-Hides the X and LinkedIn feeds and notifications. Posting and messages still work. Unlocking takes 15 seconds.
+Hides X, LinkedIn and Instagram feeds. Keeps messages and profile browsing. Instagram feeds stay off.
 
 **Category:** Productivity. **Language:** English.
 
 **Description:**
 
-Focus Feed turns the X and LinkedIn feeds off by default. You can still post, read your messages and look people up. The feed is just not there when you open the site.
+Focus Feed hides feeds on X, LinkedIn and Instagram. You can still read your messages and look people up. X and LinkedIn have a timed unlock. Instagram feeds stay off.
 
 - Hides the feed and notifications on X and LinkedIn. Posting and messages keep working.
-- Unlocking takes 15 seconds of staying on the page. Switching tabs or apps resets the timer.
+- Instagram keeps messages, account search and profiles available. Home, Explore recommendations, Reels, Stories and notifications stay hidden.
+- On X and LinkedIn, unlocking takes 15 seconds of staying on the page. Switching tabs or apps resets the timer.
 - Once unlocked, the feed and notifications stay on until you click Hide feed.
 - Every morning at 6 AM, everything is hidden again.
 - The toolbar popup shows how many sessions were blocked and roughly how much time you won back.
@@ -36,13 +37,13 @@ Open source: https://github.com/DominiquePaul/focus-feed
 ## Privacy practices tab
 
 **Single purpose:**
-Reduces distraction on X and LinkedIn by hiding the feed and notifications until the user deliberately unlocks them.
+Reduces distraction by hiding feeds and notifications on X, LinkedIn and Instagram. Instagram keeps messages, account search and profiles available. X and LinkedIn can be unlocked after a delay.
 
 **Permission justification, `storage`:**
 Saves whether the feed is unlocked (so it stays unlocked across tabs and reloads until 6 AM) and the local daily counts shown in the statistics popup.
 
-**Host permission justification (x.com, twitter.com, linkedin.com):**
-The content script hides the feed and notification elements on these sites and shows the unlock card. It runs on no other sites.
+**Host permission justification (x.com, twitter.com, linkedin.com, instagram.com):**
+The content scripts hide feed and notification elements on these sites. X and LinkedIn show an unlock card. Instagram shows shortcuts to messages and account search. It runs on no other sites.
 
 **Remote code:** No, I am not using remote code. All code is in the package.
 

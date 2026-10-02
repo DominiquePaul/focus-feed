@@ -1,0 +1,28 @@
+/* Injected only on Instagram, before its document renders. Unknown routes
+   stay hidden until instagram.js identifies messages, a profile, or login. */
+html:not([data-ff-ig-mode]) body,
+html:not([data-ff-ig-mode]) body *,
+html[data-ff-ig-mode="blocked"] body,
+html[data-ff-ig-mode="blocked"] body *,
+html[data-ff-ig-mode="post"] body,
+html[data-ff-ig-mode="post"] body * {
+  visibility: hidden !important;
+}
+
+html[data-ff-ig-mode="blocked"] [data-ff-ig-keep],
+html[data-ff-ig-mode="blocked"] [data-ff-ig-keep] *,
+html[data-ff-ig-mode="post"] [role="dialog"]:has(article),
+html[data-ff-ig-mode="post"] [role="dialog"]:has(article) * {
+  visibility: visible !important;
+}
+
+/* Search results can include tags, places, and media as well as accounts.
+   Hide those destinations even if Instagram inserts them in the search panel. */
+html[data-ff-ig-mode="blocked"] a:is([href*="/p/"], [href*="/reel/"], [href*="/reels/"], [href*="/stories/"], [href*="/explore/tags/"], [href*="/explore/locations/"]),
+/* Global distractions stay hidden on profiles and in messages, too. A
+   profile's own /username/reels/ tab remains available. */
+a:is([href="/reels/"], [href="/reels"], [href="/notifications/"], [href="/notifications"], [href="/accounts/activity/"], [href^="/stories/"]) {
+  display: none !important;
+}
+
+focus-feed-instagram[hidden] { display: none !important; }
